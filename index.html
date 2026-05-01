@@ -3,26 +3,23 @@
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
-        <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+        <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.2/aframe/build/aframe-ar.js"></script>
+        <script src="https://unpkg.com/aframe-gps-entity-place@latest/dist/aframe-gps-entity-place.min.js"></script>
         <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
         
         <style>
-            /* 霧面陰影按鍵樣式 */
             #music-button {
                 position: absolute;
                 bottom: 30px; 
                 left: 50%; 
                 transform: translateX(-50%); 
                 z-index: 9999; 
-
                 background: rgba(255, 255, 255, 0.15); 
                 backdrop-filter: blur(8px); 
                 -webkit-backdrop-filter: blur(8px); 
                 border: 1px solid rgba(255, 255, 255, 0.3); 
-                
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-
                 color: white;
                 border-radius: 30px; 
                 padding: 15px 40px;
@@ -54,13 +51,15 @@
             <a-assets>
                 <a-asset-item id="cow-model" src="cow_dance.glb"></a-asset-item>
                 <a-asset-item id="grass-model" src="realistics_grass_06.glb"></a-asset-item>
-                
                 <audio id="bg-music" src="Sandungueo_sin_freno.mp3" preload="auto" loop="true"></audio>
             </a-assets>
 
+            <!-- ADD LIGHTING HERE -->
+            <a-light type="ambient" intensity="1"></a-light>
+            <a-light type="directional" intensity="0.5" position="5 10 7"></a-light>
+
             <a-entity id="ar-group">
                 <a-entity gltf-model="#cow-model" scale="1 1 1" position="0 0 0" animation-mixer="clip: *; loop: repeat"></a-entity>
-
                 <a-entity gltf-model="#grass-model" scale="1 1 1" position="0.5 0 0.8" rotation="0 45 0"></a-entity>
                 <a-entity gltf-model="#grass-model" scale="1.1 1.1 1.1" position="-0.7 0 1.2" rotation="0 180 0"></a-entity>
                 <a-entity gltf-model="#grass-model" scale="0.9 0.9 0.9" position="1.2 0 -0.5" rotation="0 90 0"></a-entity>
@@ -74,36 +73,30 @@
         </a-scene>
 
         <script>
-            // 音樂按鈕邏輯
             document.getElementById('music-button').addEventListener('click', function() {
                 this.style.display = 'none';
                 var music = document.getElementById('bg-music');
                 music.play();
             });
 
-            // 網頁載入時動態取得手機 GPS 位置
             window.onload = () => {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             let lat = position.coords.latitude;
                             let lon = position.coords.longitude;
-                            
-                            // 加入微小偏移量 (約幾公尺)，讓物件出現在你的前方而不是與你重疊
                             let offsetLat = lat + 0.00005; 
                             
-                            // 將計算好的座標賦予模型群組
                             let arGroup = document.getElementById('ar-group');
                             arGroup.setAttribute('gps-entity-place', `latitude: ${offsetLat}; longitude: ${lon};`);
                             
                             console.log(`定位成功！模型已動態生成於：${offsetLat}, ${lon}`);
                         },
                         (err) => {
-                            // 若無開啟定位權限，給予提示
                             alert("無法取得 GPS 位置，請確保您已允許瀏覽器存取定位權限！");
                         },
                         {
-                            enableHighAccuracy: true, // 要求高精準度定位
+                            enableHighAccuracy: true,
                             maximumAge: 0,
                             timeout: 10000
                         }
@@ -114,4 +107,4 @@
             };
         </script>
     </body>
-</html>
+</html>            
